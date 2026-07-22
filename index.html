@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Terranis • Global Disaster Telemetry Observatory</title>
 
-  <!-- Editorial Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600;1,700;1,900&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Leaflet Map CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <style>
@@ -41,7 +39,7 @@
       color: var(--text-dark);
       padding: 40px 24px 60px 24px;
       line-height: 1.5;
-      overflow-x: hidden; /* Prevents unwanted horizontal scroll on mobile */
+      overflow-x: hidden;
     }
 
     .app-container {
@@ -52,7 +50,6 @@
       gap: 28px;
     }
 
-    /* HEADER SECTION */
     header {
       text-align: center;
       display: flex;
@@ -113,7 +110,6 @@
       text-align: center;
     }
 
-    /* KPI STATS ROW */
     .kpi-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -151,7 +147,6 @@
 
     .kpi-icon { font-size: 2rem; }
 
-    /* CONTROLS BAR */
     .controls-bar {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
@@ -162,7 +157,7 @@
       align-items: center;
       gap: 16px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-      flex-wrap: wrap; /* Allows controls to wrap gracefully on smaller widths */
+      flex-wrap: wrap;
     }
 
     .filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -170,7 +165,7 @@
     .filter-btn {
       background: #F4F3ED;
       border: 1px solid var(--border-color);
-      padding: 8px 16px; /* Increased touch area */
+      padding: 8px 16px;
       border-radius: 99px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.75rem;
@@ -187,12 +182,12 @@
     }
 
     .search-input {
-      padding: 10px 16px; /* Better mobile tap target */
+      padding: 10px 16px;
       border-radius: 99px;
       border: 1px solid var(--border-color);
       outline: none;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 16px; /* Prevents auto-zoom on iOS inputs */
+      font-size: 16px;
       width: 280px;
       max-width: 100%;
       background: #F4F3ED;
@@ -201,7 +196,6 @@
 
     .search-input:focus { border-color: #C87A5B; background: #FFF; }
 
-    /* MAP PANEL */
     .map-panel {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
@@ -258,7 +252,6 @@
 
     #map { height: 500px; width: 100%; background: #E6E3D8; }
 
-    /* MAP BADGES */
     .custom-badge-wrapper { background: transparent; border: none; }
     .map-badge {
       width: 44px;
@@ -280,13 +273,12 @@
     .badge-fire { border: 3px solid var(--accent-orange); }
     .badge-heat { border: 3px solid #D97706; }
 
-    /* DETAIL DRAWER */
     .detail-drawer {
       position: absolute;
       top: 65px;
       right: 16px;
       width: 340px;
-      max-width: calc(100% - 32px); /* Prevents overflow off mobile screens */
+      max-width: calc(100% - 32px);
       background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(12px);
       border: 1px solid var(--border-color);
@@ -327,7 +319,6 @@
       justify-content: center;
     }
 
-    /* BOTTOM GRID */
     .bottom-grid {
       display: grid;
       grid-template-columns: 1fr 360px;
@@ -344,7 +335,7 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      min-width: 0; /* Prevents flex items from overflowing grid bounds */
+      min-width: 0;
     }
 
     h2.heading-bold {
@@ -360,9 +351,8 @@
       margin-top: 2px;
     }
 
-    /* TABLE CONTAINER */
     .table-scroll-container {
-      overflow-x: auto; /* Allows smooth horizontal scrolling on mobile tables */
+      overflow-x: auto;
       overflow-y: auto;
       padding-right: 4px;
     }
@@ -371,7 +361,7 @@
       width: 100%;
       border-collapse: collapse;
       text-align: left;
-      min-width: 500px; /* Ensures table retains legibility on small screens */
+      min-width: 500px;
     }
 
     .disaster-table th {
@@ -435,7 +425,6 @@
     .sev-medium { background: var(--accent-yellow); }
     .sev-low { background: var(--accent-green); }
 
-    /* SOURCE TEXT */
     .source-text {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.775rem;
@@ -443,12 +432,11 @@
       font-weight: 600;
     }
 
-    /* VIEW ALL BUTTONS */
     .view-all-btn {
       width: 100%;
       background: #F4F3ED;
       border: 1px solid var(--border-color);
-      padding: 12px; /* Enhanced touch target */
+      padding: 12px;
       border-radius: 12px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.75rem;
@@ -465,7 +453,6 @@
       border-color: var(--text-serif-green);
     }
 
-    /* GLOBAL WARMING STATS GRID */
     .warming-stats-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -515,7 +502,6 @@
       font-weight: 600;
     }
 
-    /* HOTSPOT CARDS */
     .hotspot-card {
       border: 1px solid var(--border-color);
       border-radius: 14px;
@@ -542,7 +528,6 @@
       color: #C87A5B;
     }
 
-    /* WIDGETS */
     .widget-divider {
       border-top: 1px solid var(--border-subtle);
       padding-top: 14px;
@@ -631,7 +616,6 @@
       gap: 5px;
     }
 
-    /* NEWS FEED CONTAINER */
     .news-scroll-container {
       max-height: 260px;
       overflow-y: auto;
@@ -716,7 +700,6 @@
       overflow: hidden;
     }
 
-    /* FULL ARCHIVE MODAL */
     .archive-modal {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -757,7 +740,6 @@
       flex-grow: 1;
     }
 
-    /* INSTITUTIONAL FOOTER */
     footer.app-footer {
       margin-top: 40px;
       padding-top: 24px;
@@ -790,7 +772,6 @@
       text-decoration: underline;
     }
 
-    /* MEDIA QUERIES FOR MOBILE AND TABLETS */
     @media (max-width: 1024px) {
       .kpi-row { grid-template-columns: repeat(2, 1fr); }
       .bottom-grid { grid-template-columns: 1fr; }
@@ -822,11 +803,9 @@
 
   <div class="app-container">
 
-    <!-- HEADER SECTION -->
     <header>
       <div class="brand-title-group">
         <div class="brand-logo-name">
-          <!-- Terranis Custom Radar / Globe Logo -->
           <svg class="brand-svg-logo" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="32" cy="32" r="30" stroke="#1C3A27" stroke-width="2.5" fill="#FFFFFF"/>
             <circle cx="32" cy="32" r="20" stroke="#C87A5B" stroke-width="1.5" stroke-dasharray="3 3"/>
@@ -840,11 +819,9 @@
         </div>
         <h1 class="main-headline">Global Environmental Intelligence Network</h1>
       </div>
-
       <p class="sub-headline">Real-time insights into seismic activity, extreme weather, floods, wildfires, and atmospheric dynamics.</p>
     </header>
 
-    <!-- 1. TOP KPI STAT CARDS -->
     <div class="kpi-row">
       <div class="kpi-card">
         <div>
@@ -876,7 +853,6 @@
       </div>
     </div>
 
-    <!-- 2. CONTROLS BAR -->
     <div class="controls-bar">
       <div class="filter-tabs">
         <button class="filter-btn active" onclick="filterCategory('ALL', this)">All Events</button>
@@ -888,7 +864,6 @@
       <input type="text" class="search-input" id="search-bar" placeholder="🔍 Search region or hazard..." oninput="handleSearch()">
     </div>
 
-    <!-- 3. MAP VIEWPORT -->
     <div class="map-panel">
       <div class="map-header">
         <div class="brand-title">📡 Terranis Planetary Telemetry Matrix</div>
@@ -899,7 +874,6 @@
 
       <div id="map"></div>
 
-      <!-- Detail Drawer -->
       <div class="detail-drawer" id="detail-drawer">
         <button class="drawer-close" onclick="closeDrawer()">✕</button>
         <div id="drawer-banner" class="drawer-banner"></div>
@@ -907,10 +881,8 @@
       </div>
     </div>
 
-    <!-- 4. BOTTOM FEED & SUMMARY GRID -->
     <div class="bottom-grid">
       
-      <!-- LEFT DISASTER TABLE -->
       <div class="panel-box">
         <div>
           <h2 class="heading-bold">Live Disaster Stream</h2>
@@ -936,7 +908,6 @@
 
         <button class="view-all-btn" onclick="openArchiveModal('events')">View All Active Events Archive ➔</button>
 
-        <!-- ENLARGED GLOBAL WARMING METRICS WIDGET -->
         <div class="widget-divider" style="margin-top: 4px;">
           <div class="widget-title" style="font-size: 1.15rem;">Global Warming & Climate Metrics</div>
           <p class="sub-heading">Planetary climate anomaly indicators</p>
@@ -971,17 +942,14 @@
 
       </div>
 
-      <!-- RIGHT SIDEBAR -->
       <div class="panel-box">
         
-        <!-- SECTION 1: Active Hotspots -->
         <div>
           <h2 class="heading-bold">Active Hotspots</h2>
           <p class="sub-heading">Regional threat density analysis</p>
           <div id="hotspots-list"></div>
         </div>
 
-        <!-- SECTION 2: Hazard Distribution -->
         <div class="widget-divider">
           <div class="widget-title">Hazard Share</div>
           <p class="sub-heading">Proportional telemetry breakdown</p>
@@ -1019,7 +987,6 @@
           </div>
         </div>
 
-        <!-- SECTION 3: DISASTER NEWS -->
         <div class="widget-divider">
           <div class="widget-title">Fresh Disaster Reporting</div>
           <p class="sub-heading">Live field coverage & incident wire</p>
@@ -1031,7 +998,6 @@
           <button class="view-all-btn" onclick="openArchiveModal('news')">View All News Feed ➔</button>
         </div>
 
-        <!-- SECTION 4: DATA FEED HEALTH -->
         <div class="widget-divider">
           <div class="widget-title">Data Feed Health</div>
           <p class="sub-heading">Live endpoint status</p>
@@ -1056,7 +1022,6 @@
 
     </div>
 
-    <!-- INSTITUTIONAL FOOTER -->
     <footer class="app-footer">
       <div>© 2026 Terranis • Global Environmental Intelligence Network</div>
       <div class="footer-links">
@@ -1068,7 +1033,6 @@
 
   </div>
 
-  <!-- FULL ARCHIVE MODAL OVERLAY -->
   <div class="archive-modal" id="archive-modal">
     <div class="modal-card">
       <div class="modal-header">
@@ -1079,7 +1043,6 @@
     </div>
   </div>
 
-  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
@@ -1148,7 +1111,6 @@
 
     function closeDrawer() { document.getElementById('detail-drawer').style.display = 'none'; }
 
-    // 1. FETCH LIVE SEISMIC DATA FROM USGS API
     async function fetchUSGS() {
       try {
         const res = await fetch('https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude=2.5&limit=30');
@@ -1174,7 +1136,6 @@
       } catch (err) { console.error('USGS Error:', err); }
     }
 
-    // 2. FETCH NOAA METEOROLOGICAL WATCH NET
     async function fetchNOAAMeteorology() {
       const heatHotspots = [
         { name: "Tokyo Metropolitan Area, Japan", lat: 35.6762, lon: 139.6503 },
@@ -1211,7 +1172,6 @@
       }
     }
 
-    // 3. FETCH COPERNICUS GLOFAS FLOOD TELEMETRY
     async function fetchGloFASFloods() {
       const riverBasins = [
         { name: "Himachal / Sutlej River Basin", lat: 31.1048, lon: 77.1734 },
@@ -1252,7 +1212,6 @@
       }
     }
 
-    // 4. FETCH LIVE CLIMATE METRICS (NOAA GML CO2)
     async function fetchClimateMetrics() {
       try {
         const res = await fetch('https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_daily_mlo.json');
@@ -1266,7 +1225,6 @@
       }
     }
 
-    // 5. FETCH DISASTER NEWS
     async function fetchDisasterNewsWithImages() {
       const container = document.getElementById('news-feed-list');
       const feedSearch = encodeURIComponent('https://news.google.com/rss/search?q=natural+disaster+OR+flooding+OR+earthquake+OR+heatwave+OR+wildfire+OR+tropical+storm&hl=en-US&gl=US&ceid=US:en');
@@ -1320,7 +1278,6 @@
       }).join('');
     }
 
-    // UPDATE UI WITH SORTING & STATIC SOURCES
     function renderFilteredView() {
       const query = document.getElementById('search-bar').value.toLowerCase();
       mapLayerGroup.clearLayers();
@@ -1355,7 +1312,6 @@
       `).join('');
     }
 
-    // ARCHIVE MODAL HANDLERS
     function openArchiveModal(type) {
       const modal = document.getElementById('archive-modal');
       const title = document.getElementById('modal-title');
