@@ -1,6 +1,4 @@
-<div align="center">
-
-  <img src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=1200&auto=format&fit=crop&q=80" alt="Terranis Banner" width="100%" style="border-radius: 12px;"/>
+<div/>
 
   <h1>Terranis • Global Environmental Intelligence Network</h1>
   <p><b>Real-time disaster and climate telemetry.</b></p>
