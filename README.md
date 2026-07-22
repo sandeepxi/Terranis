@@ -33,4 +33,4 @@ Because Terranis is built as a lightweight, lightning-fast single-file applicati
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/sandeepxi.github.io/terranis.git](https://github.com/sandeepxi/terranis.git)
+   git clone [https://github.com/sandeepxi/Terranis.git](https://github.com/sandeepxi/Terranis.git)
