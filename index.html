@@ -41,6 +41,7 @@
       color: var(--text-dark);
       padding: 40px 24px 60px 24px;
       line-height: 1.5;
+      overflow-x: hidden; /* Prevents unwanted horizontal scroll on mobile */
     }
 
     .app-container {
@@ -109,6 +110,7 @@
       color: var(--text-muted);
       max-width: 680px;
       line-height: 1.5;
+      text-align: center;
     }
 
     /* KPI STATS ROW */
@@ -160,14 +162,15 @@
       align-items: center;
       gap: 16px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      flex-wrap: wrap; /* Allows controls to wrap gracefully on smaller widths */
     }
 
-    .filter-tabs { display: flex; gap: 8px; }
+    .filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
 
     .filter-btn {
       background: #F4F3ED;
       border: 1px solid var(--border-color);
-      padding: 6px 16px;
+      padding: 8px 16px; /* Increased touch area */
       border-radius: 99px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.75rem;
@@ -184,13 +187,14 @@
     }
 
     .search-input {
-      padding: 8px 16px;
+      padding: 10px 16px; /* Better mobile tap target */
       border-radius: 99px;
       border: 1px solid var(--border-color);
       outline: none;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.775rem;
+      font-size: 16px; /* Prevents auto-zoom on iOS inputs */
       width: 280px;
+      max-width: 100%;
       background: #F4F3ED;
       color: var(--text-dark);
     }
@@ -214,6 +218,8 @@
       justify-content: space-between;
       align-items: center;
       background: #FFFFFF;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .brand-title {
@@ -252,7 +258,7 @@
 
     #map { height: 500px; width: 100%; background: #E6E3D8; }
 
-    /* MAP BADGES (ENLARGED) */
+    /* MAP BADGES */
     .custom-badge-wrapper { background: transparent; border: none; }
     .map-badge {
       width: 44px;
@@ -280,6 +286,7 @@
       top: 65px;
       right: 16px;
       width: 340px;
+      max-width: calc(100% - 32px); /* Prevents overflow off mobile screens */
       background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(12px);
       border: 1px solid var(--border-color);
@@ -311,10 +318,13 @@
       right: 12px;
       background: rgba(0,0,0,0.06);
       border: none;
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* BOTTOM GRID */
@@ -334,6 +344,7 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
+      min-width: 0; /* Prevents flex items from overflowing grid bounds */
     }
 
     h2.heading-bold {
@@ -351,6 +362,7 @@
 
     /* TABLE CONTAINER */
     .table-scroll-container {
+      overflow-x: auto; /* Allows smooth horizontal scrolling on mobile tables */
       overflow-y: auto;
       padding-right: 4px;
     }
@@ -359,6 +371,7 @@
       width: 100%;
       border-collapse: collapse;
       text-align: left;
+      min-width: 500px; /* Ensures table retains legibility on small screens */
     }
 
     .disaster-table th {
@@ -435,7 +448,7 @@
       width: 100%;
       background: #F4F3ED;
       border: 1px solid var(--border-color);
-      padding: 10px;
+      padding: 12px; /* Enhanced touch target */
       border-radius: 12px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.75rem;
@@ -512,6 +525,7 @@
       align-items: center;
       margin-top: 8px;
       background: var(--card-bg);
+      gap: 8px;
     }
 
     .hotspot-country {
@@ -754,11 +768,16 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.725rem;
       color: var(--text-muted);
+      flex-wrap: wrap;
+      gap: 12px;
+      text-align: center;
     }
 
     .footer-links {
       display: flex;
       gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
     .footer-links a {
@@ -771,12 +790,31 @@
       text-decoration: underline;
     }
 
+    /* MEDIA QUERIES FOR MOBILE AND TABLETS */
     @media (max-width: 1024px) {
       .kpi-row { grid-template-columns: repeat(2, 1fr); }
       .bottom-grid { grid-template-columns: 1fr; }
       .main-headline { font-size: 2.1rem; }
       .terranis-brand-name { font-size: 2.8rem; }
-      footer.app-footer { flex-direction: column; gap: 12px; text-align: center; }
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 16px 12px 30px 12px; }
+      .kpi-row { grid-template-columns: 1fr; }
+      .terranis-brand-name { font-size: 2.2rem; }
+      .main-headline { font-size: 1.6rem; }
+      .controls-bar { flex-direction: column; align-items: stretch; }
+      .search-input { width: 100%; }
+      .warming-stats-grid { grid-template-columns: 1fr; }
+      #map { height: 350px; }
+      .detail-drawer {
+        top: auto;
+        bottom: 10px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+        max-width: none;
+      }
     }
   </style>
 </head>
@@ -996,7 +1034,7 @@
         <!-- SECTION 4: DATA FEED HEALTH -->
         <div class="widget-divider">
           <div class="widget-title">Data Feed Health</div>
-          <p class="sub-heading">Live endpoint status & latency</p>
+          <p class="sub-heading">Live endpoint status</p>
 
           <div class="status-list">
             <div class="status-row">
@@ -1009,7 +1047,7 @@
             </div>
             <div class="status-row">
               <span class="status-name">Copernicus</span>
-              <span class="status-badge"><span class="pulse-dot"></span> ACTIVE (32ms)</span>
+              <span class="status-badge"><span class="pulse-dot"></span> 100% ONLINE</span>
             </div>
           </div>
         </div>
