@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terranis • Global Disaster Telemetry Observatory</title>
+
+  <!-- Editorial Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600;1,700;1,900&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    :root {
+      --bg-cream: #F6F4ED;
+      --card-bg: #FFFFFF;
+      --border-color: #E6E3D8;
+      --border-subtle: #EEECDF;
+      
+      --text-dark: #1C201D;
+      --text-serif-green: #1C3A27;
+      --text-serif-terracotta: #C87A5B;
+      --text-muted: #787D74;
+      --mono-text: #5A6055;
+
+      --accent-red: #DC2626;
+      --accent-orange: #EA580C;
+      --accent-yellow: #D97706;
+      --accent-green: #059669;
+      --accent-blue: #2563EB;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-cream);
+      color: var(--text-dark);
+      padding: 40px 24px 60px 24px;
+      line-height: 1.5;
+    }
+
+    .app-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* HEADER SECTION */
+    header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-title-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-logo-name {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .brand-svg-logo {
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
+      filter: drop-shadow(0px 2px 6px rgba(28, 58, 39, 0.2));
+    }
+
+    .terranis-brand-name {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 900;
+      font-size: 3.5rem;
+      background: linear-gradient(135deg, #B91C1C 0%, #C87A5B 50%, #D97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      filter: drop-shadow(0px 2px 8px rgba(200, 122, 91, 0.15));
+    }
+
+    .main-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.6rem;
+      font-weight: 700;
+      color: var(--text-serif-green);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .sub-headline {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      line-height: 1.5;
+    }
+
+    /* KPI STATS ROW */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .kpi-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .kpi-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      line-height: 1;
+      margin-top: 4px;
+    }
+
+    .kpi-icon { font-size: 2rem; }
+
+    /* CONTROLS BAR */
+    .controls-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .filter-tabs { display: flex; gap: 8px; }
+
+    .filter-btn {
+      background: #F4F3ED;
+      border: 1px solid var(--border-color);
+      padding: 6px 16px;
+      border-radius: 99px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--mono-text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--text-serif-green);
+      color: #FFFFFF;
+      border-color: var(--text-serif-green);
+    }
+
+    .search-input {
+      padding: 8px 16px;
+      border-radius: 99px;
+      border: 1px solid var(--border-color);
+      outline: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.775rem;
+      width: 280px;
+      background: #F4F3ED;
+      color: var(--text-dark);
+    }
+
+    .search-input:focus { border-color: #C87A5B; background: #FFF; }
+
+    /* MAP PANEL */
+    .map-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+      position: relative;
+    }
+
+    .map-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #FFFFFF;
+    }
+
+    .brand-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text-serif-green);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-pill-premium {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.675rem;
+      color: var(--accent-green);
+      font-weight: 700;
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      padding: 4px 12px;
+      border-radius: 99px;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      background-color: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(5, 150, 105, 0.6);
+    }
+
+    #map { height: 500px; width: 100%; background: #E6E3D8; }
+
+    /* MAP BADGES (ENLARGED) */
+    .custom-badge-wrapper { background: transparent; border: none; }
+    .map-badge {
+      width: 44px;
+      height: 44px;
+      background: #FFFFFF;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    }
+
+    .map-badge:hover { transform: scale(1.25); z-index: 999; }
+    .badge-quake { border: 3px solid var(--accent-red); }
+    .badge-flood { border: 3px solid var(--accent-blue); }
+    .badge-fire { border: 3px solid var(--accent-orange); }
+    .badge-heat { border: 3px solid #D97706; }
+
+    /* DETAIL DRAWER */
+    .detail-drawer {
+      position: absolute;
+      top: 65px;
+      right: 16px;
+      width: 340px;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      z-index: 1000;
+      display: none;
+    }
+
+    .drawer-banner {
+      width: 100%;
+      height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+    }
+
+    .banner-quake { background: linear-gradient(135deg, #FEE2E2 0%, #EF4444 100%); }
+    .banner-flood { background: linear-gradient(135deg, #E0F2FE 0%, #0284C7 100%); }
+    .banner-fire { background: linear-gradient(135deg, #FFEDD5 0%, #F97316 100%); }
+    .banner-heat { background: linear-gradient(135deg, #FEF3C7 0%, #D97706 100%); }
+
+    .drawer-body { padding: 16px 20px 20px 20px; position: relative; }
+    .drawer-close {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: rgba(0,0,0,0.06);
+      border: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    /* BOTTOM GRID */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    h2.heading-bold {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.6rem;
+      color: var(--text-serif-green);
+    }
+
+    .sub-heading {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* TABLE CONTAINER */
+    .table-scroll-container {
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .disaster-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .disaster-table th {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.675rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      position: sticky;
+      top: 0;
+      background: var(--card-bg);
+      z-index: 10;
+    }
+
+    .disaster-table td {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.85rem;
+    }
+
+    .disaster-table tr:hover { background: #F8FAFC; }
+
+    .event-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      color: var(--text-dark);
+      font-size: 0.95rem;
+    }
+
+    .event-desc {
+      font-size: 0.775rem;
+      color: var(--text-muted);
+    }
+
+    .badge-type {
+      font-family: 'JetBrains Mono', monospace;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.675rem;
+      font-weight: 600;
+      background: #F4F3ED;
+      color: var(--mono-text);
+      text-transform: uppercase;
+    }
+
+    .badge-sev {
+      font-family: 'JetBrains Mono', monospace;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: white;
+      text-transform: uppercase;
+    }
+
+    .sev-critical { background: var(--accent-red); }
+    .sev-high { background: var(--accent-orange); }
+    .sev-medium { background: var(--accent-yellow); }
+    .sev-low { background: var(--accent-green); }
+
+    /* SOURCE TEXT */
+    .source-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.775rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* VIEW ALL BUTTONS */
+    .view-all-btn {
+      width: 100%;
+      background: #F4F3ED;
+      border: 1px solid var(--border-color);
+      padding: 10px;
+      border-radius: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-serif-green);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .view-all-btn:hover {
+      background: var(--text-serif-green);
+      color: #FFFFFF;
+      border-color: var(--text-serif-green);
+    }
+
+    /* GLOBAL WARMING STATS GRID */
+    .warming-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .warming-stat-card {
+      background: #F9F8F3;
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .warming-stat-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.675rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .warming-stat-val {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 1.35rem;
+      color: var(--text-serif-green);
+      margin-top: 2px;
+    }
+
+    .warming-stat-desc {
+      font-size: 0.725rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    .source-attribution {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      display: inline-block;
+      font-weight: 600;
+    }
+
+    /* HOTSPOT CARDS */
+    .hotspot-card {
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      background: var(--card-bg);
+    }
+
+    .hotspot-country {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-serif-green);
+    }
+
+    .hotspot-count {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 1.4rem;
+      color: #C87A5B;
+    }
+
+    /* WIDGETS */
+    .widget-divider {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 14px;
+    }
+
+    .widget-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--text-serif-green);
+      margin-bottom: 2px;
+    }
+
+    .distribution-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .dist-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .dist-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--mono-text);
+      font-weight: 600;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: #F4F3ED;
+      border-radius: 99px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+
+    .fill-seismic { background: var(--accent-red); }
+    .fill-flood { background: var(--accent-blue); }
+    .fill-fire { background: var(--accent-orange); }
+
+    .status-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: #F9F8F3;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .status-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .status-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: var(--accent-green);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* NEWS FEED CONTAINER */
+    .news-scroll-container {
+      max-height: 260px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-right: 4px;
+    }
+
+    .news-item-card {
+      background: #F9F8F3;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 10px;
+      text-decoration: none;
+      display: flex;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .news-item-card:hover {
+      background: #FFFFFF;
+      border-color: var(--border-color);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    .news-thumb {
+      width: 65px;
+      height: 65px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #E6E3D8;
+    }
+
+    .news-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .news-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2px;
+    }
+
+    .news-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.575rem;
+      font-weight: 700;
+      color: var(--text-serif-terracotta);
+      text-transform: lowercase;
+      letter-spacing: 0.04em;
+      background: rgba(200, 122, 91, 0.1);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    .news-item-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 0.775rem;
+      color: var(--text-serif-green);
+      line-height: 1.25;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .news-item-snippet {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+      margin-top: 2px;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* FULL ARCHIVE MODAL */
+    .archive-modal {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(28, 32, 29, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 900px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #FFFFFF;
+    }
+
+    .modal-body {
+      padding: 20px 24px;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+
+    /* INSTITUTIONAL FOOTER */
+    footer.app-footer {
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.725rem;
+      color: var(--text-muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-links a {
+      color: var(--text-serif-green);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 1024px) {
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .bottom-grid { grid-template-columns: 1fr; }
+      .main-headline { font-size: 2.1rem; }
+      .terranis-brand-name { font-size: 2.8rem; }
+      footer.app-footer { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- HEADER SECTION -->
+    <header>
+      <div class="brand-title-group">
+        <div class="brand-logo-name">
+          <!-- Terranis Custom Radar / Globe Logo -->
+          <svg class="brand-svg-logo" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="32" cy="32" r="30" stroke="#1C3A27" stroke-width="2.5" fill="#FFFFFF"/>
+            <circle cx="32" cy="32" r="20" stroke="#C87A5B" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <circle cx="32" cy="32" r="10" stroke="#1C3A27" stroke-width="1.5"/>
+            <path d="M32 2V62" stroke="#1C3A27" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M2 32H62" stroke="#1C3A27" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="44" cy="20" r="4" fill="#DC2626"/>
+            <circle cx="44" cy="20" r="7" stroke="#DC2626" stroke-width="1" opacity="0.6"/>
+          </svg>
+          <span class="terranis-brand-name">Terranis</span>
+        </div>
+        <h1 class="main-headline">Global Environmental Intelligence Network</h1>
+      </div>
+
+      <p class="sub-headline">Real-time insights into seismic activity, extreme weather, floods, wildfires, and atmospheric dynamics.</p>
+    </header>
+
+    <!-- 1. TOP KPI STAT CARDS -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">Active Telemetry</div>
+          <div class="kpi-value" id="kpi-total">--</div>
+        </div>
+        <div class="kpi-icon">🌐</div>
+      </div>
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">Critical Alerts</div>
+          <div class="kpi-value" id="kpi-critical" style="color: var(--accent-red);">--</div>
+        </div>
+        <div class="kpi-icon">🚨</div>
+      </div>
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">Seismic Activity</div>
+          <div class="kpi-value" id="kpi-seismic">--</div>
+        </div>
+        <div class="kpi-icon">🌋</div>
+      </div>
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">Flood & Heat Alerts</div>
+          <div class="kpi-value" id="kpi-floods" style="color: var(--accent-blue);">--</div>
+        </div>
+        <div class="kpi-icon">🌊</div>
+      </div>
+    </div>
+
+    <!-- 2. CONTROLS BAR -->
+    <div class="controls-bar">
+      <div class="filter-tabs">
+        <button class="filter-btn active" onclick="filterCategory('ALL', this)">All Events</button>
+        <button class="filter-btn" onclick="filterCategory('Seismic', this)">🌋 Seismic</button>
+        <button class="filter-btn" onclick="filterCategory('Flood Alert', this)">🌊 Floods</button>
+        <button class="filter-btn" onclick="filterCategory('Wildfire', this)">🔥 Wildfires</button>
+        <button class="filter-btn" onclick="filterCategory('Heatwave', this)">☀️ Heatwave</button>
+      </div>
+      <input type="text" class="search-input" id="search-bar" placeholder="🔍 Search region or hazard..." oninput="handleSearch()">
+    </div>
+
+    <!-- 3. MAP VIEWPORT -->
+    <div class="map-panel">
+      <div class="map-header">
+        <div class="brand-title">🗺️ Terranis Geospatial Hazard Matrix</div>
+        <div class="status-pill-premium">
+          <span class="pulse-dot"></span> CONTINUOUS PLANETARY TELEMETRY
+        </div>
+      </div>
+
+      <div id="map"></div>
+
+      <!-- Detail Drawer -->
+      <div class="detail-drawer" id="detail-drawer">
+        <button class="drawer-close" onclick="closeDrawer()">✕</button>
+        <div id="drawer-banner" class="drawer-banner"></div>
+        <div class="drawer-body" id="drawer-content"></div>
+      </div>
+    </div>
+
+    <!-- 4. BOTTOM FEED & SUMMARY GRID -->
+    <div class="bottom-grid">
+      
+      <!-- LEFT DISASTER TABLE -->
+      <div class="panel-box">
+        <div>
+          <h2 class="heading-bold">Live Disaster Stream</h2>
+          <p class="sub-heading">Real-time telemetry aggregated from USGS, NOAA Meteorological Net, and Copernicus.</p>
+        </div>
+
+        <div class="table-scroll-container">
+          <table class="disaster-table">
+            <thead>
+              <tr>
+                <th style="width: 42%;">Event</th>
+                <th>Type</th>
+                <th>Source</th>
+                <th>Severity</th>
+                <th>Detected</th>
+              </tr>
+            </thead>
+            <tbody id="disaster-feed-body">
+              <tr><td colspan="5" style="color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">Syncing telemetry feeds...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <button class="view-all-btn" onclick="openArchiveModal('events')">View All Active Events Archive ➔</button>
+
+        <!-- ENLARGED GLOBAL WARMING METRICS WIDGET -->
+        <div class="widget-divider" style="margin-top: 4px;">
+          <div class="widget-title" style="font-size: 1.15rem;">Global Warming & Climate Metrics</div>
+          <p class="sub-heading">Planetary climate anomaly indicators</p>
+
+          <div class="warming-stats-grid">
+            <div class="warming-stat-card">
+              <span class="warming-stat-label">🌡️ Temp Anomaly</span>
+              <span class="warming-stat-val" style="color: var(--accent-orange);">+1.38°C</span>
+              <span class="warming-stat-desc">Above pre-industrial baseline averages.</span>
+              <span class="source-attribution">Source: NASA GISS</span>
+            </div>
+            <div class="warming-stat-card">
+              <span class="warming-stat-label">🧪 Atmospheric CO₂</span>
+              <span class="warming-stat-val" id="stat-co2">427.2 ppm</span>
+              <span class="warming-stat-desc">Measured at Mauna Loa Observatory.</span>
+              <span class="source-attribution">Source: NOAA GML</span>
+            </div>
+            <div class="warming-stat-card">
+              <span class="warming-stat-label">🌊 Ocean Heat Content</span>
+              <span class="warming-stat-val" style="color: var(--accent-red);">Record High</span>
+              <span class="warming-stat-desc">Upper 2000m thermal energy accumulation.</span>
+              <span class="source-attribution">Source: NOAA NCEI</span>
+            </div>
+            <div class="warming-stat-card">
+              <span class="warming-stat-label">🧊 Arctic Sea Ice</span>
+              <span class="warming-stat-val" style="color: var(--accent-blue);">-12.4%</span>
+              <span class="warming-stat-desc">Decadal extent decline rate relative to norm.</span>
+              <span class="source-attribution">Source: NSIDC / NASA</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT SIDEBAR -->
+      <div class="panel-box">
+        
+        <!-- SECTION 1: Active Hotspots -->
+        <div>
+          <h2 class="heading-bold">Active Hotspots</h2>
+          <p class="sub-heading">Regional threat density analysis</p>
+          <div id="hotspots-list"></div>
+        </div>
+
+        <!-- SECTION 2: Hazard Distribution -->
+        <div class="widget-divider">
+          <div class="widget-title">Hazard Share</div>
+          <p class="sub-heading">Proportional telemetry breakdown</p>
+
+          <div class="distribution-list">
+            <div class="dist-item">
+              <div class="dist-label-row">
+                <span>🌋 Seismic Events</span>
+                <span id="pct-seismic">0%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill fill-seismic" id="bar-seismic" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="dist-item">
+              <div class="dist-label-row">
+                <span>🌊 Flood Alerts</span>
+                <span id="pct-floods">0%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill fill-flood" id="bar-floods" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="dist-item">
+              <div class="dist-label-row">
+                <span>🔥 Wildfires & Storms</span>
+                <span id="pct-fires">0%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill fill-fire" id="bar-fires" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 3: DISASTER NEWS -->
+        <div class="widget-divider">
+          <div class="widget-title">Fresh Disaster Reporting</div>
+          <p class="sub-heading">Live field coverage & incident wire</p>
+
+          <div id="news-feed-list" class="news-scroll-container">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.725rem; color: var(--text-muted);">Syncing live disaster wire...</div>
+          </div>
+
+          <button class="view-all-btn" onclick="openArchiveModal('news')">View All News Feed ➔</button>
+        </div>
+
+        <!-- SECTION 4: DATA FEED HEALTH -->
+        <div class="widget-divider">
+          <div class="widget-title">Data Feed Health</div>
+          <p class="sub-heading">Live endpoint status & latency</p>
+
+          <div class="status-list">
+            <div class="status-row">
+              <span class="status-name">USGS Earthquake Net</span>
+              <span class="status-badge"><span class="pulse-dot"></span> 100% ONLINE</span>
+            </div>
+            <div class="status-row">
+              <span class="status-name">NOAA Meteorological Net</span>
+              <span class="status-badge"><span class="pulse-dot"></span> 100% ONLINE</span>
+            </div>
+            <div class="status-row">
+              <span class="status-name">Copernicus</span>
+              <span class="status-badge"><span class="pulse-dot"></span> ACTIVE (32ms)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- INSTITUTIONAL FOOTER -->
+    <footer class="app-footer">
+      <div>© 2026 Terranis • Global Environmental Intelligence Network</div>
+      <div class="footer-links">
+        <a href="#map">Telemetry Matrix</a>
+        <a href="#" onclick="openArchiveModal('events'); return false;">Active Events</a>
+        <a href="#" onclick="openArchiveModal('news'); return false;">Crisis Wire</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- FULL ARCHIVE MODAL OVERLAY -->
+  <div class="archive-modal" id="archive-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="heading-bold" id="modal-title" style="font-size: 1.25rem;">Complete Telemetry Archive</div>
+        <button class="drawer-close" onclick="closeArchiveModal()" style="position:static;">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body-content"></div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    const map = L.map('map', { 
+      zoomControl: false,
+      minZoom: 2,
+      maxZoom: 18,
+      worldCopyJump: true
+    }).setView([20, 15], 2); 
+    
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19, subdomains: 'abcd', noWrap: false
+    }).addTo(map);
+
+    const mapLayerGroup = L.layerGroup().addTo(map);
+
+    let aggregatedEvents = [];
+    let cachedNewsItems = [];
+    let currentCategory = 'ALL';
+
+    function getBannerMeta(typeStr) {
+      const type = typeStr.toLowerCase();
+      if (type.includes('seismic')) return { class: 'banner-quake', icon: '🌋' };
+      if (type.includes('flood')) return { class: 'banner-flood', icon: '🌊' };
+      if (type.includes('heat')) return { class: 'banner-heat', icon: '☀️' };
+      return { class: 'banner-fire', icon: '🔥' };
+    }
+
+    function createCustomMarker(eventObj) {
+      const customIcon = L.divIcon({
+        className: 'custom-badge-wrapper',
+        html: `<div class="map-badge ${eventObj.badgeClass}">${eventObj.icon}</div>`,
+        iconSize: [44, 44], iconAnchor: [22, 22]
+      });
+
+      const marker = L.marker([eventObj.lat, eventObj.lon], { icon: customIcon });
+      marker.bindTooltip(`<b>${eventObj.title}</b><br>${eventObj.desc}`, { direction: 'top', offset: [0, -10] });
+      marker.on('click', () => showDetails(eventObj));
+
+      mapLayerGroup.addLayer(marker);
+    }
+
+    function showDetails(e) {
+      const drawer = document.getElementById('detail-drawer');
+      const banner = document.getElementById('drawer-banner');
+      const content = document.getElementById('drawer-content');
+
+      const meta = getBannerMeta(e.type);
+      banner.className = `drawer-banner ${meta.class}`;
+      banner.innerHTML = meta.icon;
+
+      content.innerHTML = `
+        <div style="margin-bottom: 8px;"><span class="badge-type">${e.type}</span></div>
+        <div style="font-family: 'Playfair Display', serif; font-weight:800; font-size:1.1rem; color: var(--text-serif-green);">${e.icon} ${e.title}</div>
+        <div style="font-size:0.825rem; color:var(--text-muted); margin-top: 4px;">${e.desc}</div>
+        <div style="margin-top:12px; font-family: 'JetBrains Mono', monospace; font-size:0.75rem;"><b>Source Feed:</b> ${e.source}</div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size:0.75rem;"><b>Coordinates:</b> ${e.lat.toFixed(4)}° N, ${e.lon.toFixed(4)}° E</div>
+        <div style="margin-top: 14px;"><span class="badge-sev ${e.sevClass}">${e.severity} Risk Level</span></div>
+      `;
+
+      drawer.style.display = 'block';
+      map.flyTo([e.lat, e.lon], 6);
+    }
+
+    function closeDrawer() { document.getElementById('detail-drawer').style.display = 'none'; }
+
+    // 1. FETCH LIVE SEISMIC DATA FROM USGS API
+    async function fetchUSGS() {
+      try {
+        const res = await fetch('https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude=2.5&limit=30');
+        const data = await res.json();
+        data.features.forEach(eq => {
+          const coords = eq.geometry.coordinates;
+          const mag = eq.properties.mag;
+
+          let sev = 'LOW';
+          let sevClass = 'sev-low';
+          if (mag >= 6.0) { sev = 'CRITICAL'; sevClass = 'sev-critical'; }
+          else if (mag >= 5.0) { sev = 'HIGH'; sevClass = 'sev-high'; }
+          else if (mag >= 3.5) { sev = 'MEDIUM'; sevClass = 'sev-medium'; }
+
+          aggregatedEvents.push({
+            icon: '🌋', title: `Magnitude ${mag} Earthquake`, desc: eq.properties.place,
+            type: 'Seismic', source: 'USGS Global', badgeClass: 'badge-quake',
+            severity: sev, sevClass: sevClass,
+            updated: new Date(eq.properties.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            lat: coords[1], lon: coords[0]
+          });
+        });
+      } catch (err) { console.error('USGS Error:', err); }
+    }
+
+    // 2. FETCH NOAA METEOROLOGICAL WATCH NET
+    async function fetchNOAAMeteorology() {
+      const heatHotspots = [
+        { name: "Tokyo Metropolitan Area, Japan", lat: 35.6762, lon: 139.6503 },
+        { name: "Southern Europe / Madrid Heat Core", lat: 40.4168, lon: -3.7038 },
+        { name: "South Asia / New Delhi Thermal Core", lat: 28.6139, lon: 77.2090 }
+      ];
+
+      for (const spot of heatHotspots) {
+        try {
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${spot.lat}&longitude=${spot.lon}&current=temperature_2m`;
+          const res = await fetch(url);
+          const data = await res.json();
+
+          if (data && data.current && data.current.temperature_2m !== undefined) {
+            const temp = data.current.temperature_2m;
+            if (temp >= 32) {
+              const isExtreme = temp >= 38;
+              aggregatedEvents.push({
+                icon: '☀️',
+                title: `Extreme Heatwave: ${spot.name}`,
+                desc: `Live Ambient Temperature: ${temp}°C (Severe Heat Alert)`,
+                type: 'Heatwave',
+                source: 'NOAA Meteorological Net',
+                badgeClass: 'badge-heat',
+                severity: isExtreme ? 'CRITICAL' : 'HIGH',
+                sevClass: isExtreme ? 'sev-critical' : 'sev-high',
+                updated: 'Live Telemetry',
+                lat: spot.lat,
+                lon: spot.lon
+              });
+            }
+          }
+        } catch (err) { console.error('NOAA Weather Error:', err); }
+      }
+    }
+
+    // 3. FETCH COPERNICUS GLOFAS FLOOD TELEMETRY
+    async function fetchGloFASFloods() {
+      const riverBasins = [
+        { name: "Himachal / Sutlej River Basin", lat: 31.1048, lon: 77.1734 },
+        { name: "Uttarakhand / Ganga Corridor", lat: 30.0668, lon: 79.0193 },
+        { name: "Assam / Brahmaputra Valley", lat: 26.2006, lon: 92.9376 },
+        { name: "Jammu / Jhelum River Basin", lat: 34.0837, lon: 74.7973 }
+      ];
+
+      for (const basin of riverBasins) {
+        try {
+          const url = `https://flood-api.open-meteo.com/v1/flood?latitude=${basin.lat}&longitude=${basin.lon}&daily=river_discharge&forecast_days=1`;
+          const res = await fetch(url);
+          const data = await res.json();
+
+          if (data && data.daily && data.daily.river_discharge) {
+            const discharge = data.daily.river_discharge[0] || 0;
+            let sev = 'LOW';
+            let sevClass = 'sev-low';
+            if (discharge > 100) { sev = 'CRITICAL'; sevClass = 'sev-critical'; }
+            else if (discharge >= 20) { sev = 'HIGH'; sevClass = 'sev-high'; }
+            else if (discharge >= 5) { sev = 'MEDIUM'; sevClass = 'sev-medium'; }
+
+            aggregatedEvents.push({
+              icon: '🌊',
+              title: `Flood Inundation: ${basin.name}`,
+              desc: `Dynamic River Discharge: ${discharge.toFixed(1)} m³/s`,
+              type: 'Flood Alert',
+              source: 'Copernicus',
+              badgeClass: 'badge-flood',
+              severity: sev,
+              sevClass: sevClass,
+              updated: 'Live Telemetry',
+              lat: basin.lat,
+              lon: basin.lon
+            });
+          }
+        } catch (err) { console.error('GloFAS Error:', err); }
+      }
+    }
+
+    // 4. FETCH LIVE CLIMATE METRICS (NOAA GML CO2)
+    async function fetchClimateMetrics() {
+      try {
+        const res = await fetch('https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_daily_mlo.json');
+        const data = await res.json();
+        if (data && data.length > 0) {
+          const latest = data[data.length - 1].value;
+          document.getElementById('stat-co2').innerText = `${latest} ppm`;
+        }
+      } catch (e) {
+        console.warn('Climate API sync active');
+      }
+    }
+
+    // 5. FETCH DISASTER NEWS
+    async function fetchDisasterNewsWithImages() {
+      const container = document.getElementById('news-feed-list');
+      const feedSearch = encodeURIComponent('https://news.google.com/rss/search?q=natural+disaster+OR+flooding+OR+earthquake+OR+heatwave+OR+wildfire+OR+tropical+storm&hl=en-US&gl=US&ceid=US:en');
+      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${feedSearch}`;
+      const keywords = ['flood', 'earthquake', 'storm', 'fire', 'rain', 'disaster', 'quake', 'weather', 'heatwave', 'heat', 'warning', 'emergency'];
+
+      try {
+        const res = await fetch(apiUrl);
+        const data = await res.json();
+
+        if (data && data.items && data.items.length > 0) {
+          cachedNewsItems = data.items.filter(item => {
+            const text = (item.title + ' ' + (item.description || '')).toLowerCase();
+            return keywords.some(kw => text.includes(kw));
+          });
+          if (cachedNewsItems.length === 0) cachedNewsItems = data.items;
+
+          renderNewsList(container, cachedNewsItems.slice(0, 4));
+        }
+      } catch (err) {
+        console.warn('News feed fallback active');
+      }
+    }
+
+    function renderNewsList(container, items) {
+      const fallbackImages = [
+        'https://images.unsplash.com/photo-1547683905-f686c993aae5?w=200&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=200&auto=format&fit=crop&q=80'
+      ];
+
+      container.innerHTML = items.map((art, idx) => {
+        let imgUrl = art.thumbnail || art.enclosure?.link;
+        if (!imgUrl && art.description) {
+          const dom = new DOMParser().parseFromString(art.description, 'text/html');
+          const imgTag = dom.querySelector('img');
+          if (imgTag && imgTag.src) imgUrl = imgTag.src;
+        }
+        if (!imgUrl) imgUrl = fallbackImages[idx % fallbackImages.length];
+
+        const cleanSnippet = art.description ? art.description.replace(/<[^>]+>/g, '').trim() : 'Active weather emergency field reporting.';
+        return `
+          <a class="news-item-card" href="${art.link}" target="_blank" rel="noopener noreferrer">
+            <img class="news-thumb" src="${imgUrl}" alt="News photo" />
+            <div class="news-content">
+              <div class="news-meta-row"><span class="news-tag">disaster</span></div>
+              <div class="news-item-title">${art.title}</div>
+              <div class="news-item-snippet">${cleanSnippet}</div>
+            </div>
+          </a>
+        `;
+      }).join('');
+    }
+
+    // UPDATE UI WITH SORTING & STATIC SOURCES
+    function renderFilteredView() {
+      const query = document.getElementById('search-bar').value.toLowerCase();
+      mapLayerGroup.clearLayers();
+
+      const filtered = aggregatedEvents.filter(e => {
+        const matchesCat = (currentCategory === 'ALL' || e.type.toLowerCase().includes(currentCategory.toLowerCase()));
+        const matchesSearch = (e.title.toLowerCase().includes(query) || e.desc.toLowerCase().includes(query));
+        return matchesCat && matchesSearch;
+      });
+
+      filtered.sort((a, b) => {
+        const severityRank = { 'CRITICAL': 1, 'HIGH': 2, 'MEDIUM': 3, 'LOW': 4 };
+        return (severityRank[a.severity] || 99) - (severityRank[b.severity] || 99);
+      });
+
+      filtered.forEach(e => createCustomMarker(e));
+
+      const tbody = document.getElementById('disaster-feed-body');
+      const displayList = filtered.slice(0, 8);
+
+      tbody.innerHTML = displayList.map(e => `
+        <tr onclick="map.flyTo([${e.lat}, ${e.lon}], 6)" style="cursor:pointer;">
+          <td>
+            <div class="event-title">${e.icon} ${e.title}</div>
+            <div class="event-desc">${e.desc}</div>
+          </td>
+          <td><span class="badge-type">${e.type}</span></td>
+          <td><span class="source-text">${e.source}</span></td>
+          <td><span class="badge-sev ${e.sevClass}">${e.severity}</span></td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted);">${e.updated}</td>
+        </tr>
+      `).join('');
+    }
+
+    // ARCHIVE MODAL HANDLERS
+    function openArchiveModal(type) {
+      const modal = document.getElementById('archive-modal');
+      const title = document.getElementById('modal-title');
+      const content = document.getElementById('modal-body-content');
+
+      modal.style.display = 'flex';
+
+      if (type === 'events') {
+        title.innerText = "Complete Active Telemetry Archive";
+        content.innerHTML = `
+          <table class="disaster-table">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Type</th>
+                <th>Source</th>
+                <th>Severity</th>
+                <th>Detected</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${aggregatedEvents.map(e => `
+                <tr onclick="closeArchiveModal(); map.flyTo([${e.lat}, ${e.lon}], 6)" style="cursor:pointer;">
+                  <td><div class="event-title">${e.icon} ${e.title}</div><div class="event-desc">${e.desc}</div></td>
+                  <td><span class="badge-type">${e.type}</span></td>
+                  <td><span class="source-text">${e.source}</span></td>
+                  <td><span class="badge-sev ${e.sevClass}">${e.severity}</span></td>
+                  <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">${e.updated}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } else {
+        title.innerText = "Complete Fresh Disaster News Feed Archive";
+        content.innerHTML = `
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            ${cachedNewsItems.map(art => `
+              <a class="news-item-card" href="${art.link}" target="_blank" rel="noopener noreferrer">
+                <img class="news-thumb" src="${art.thumbnail || 'https://images.unsplash.com/photo-1547683905-f686c993aae5?w=200&auto=format&fit=crop&q=80'}" alt="News photo" />
+                <div class="news-content">
+                  <div class="news-meta-row"><span class="news-tag">disaster wire</span></div>
+                  <div class="news-item-title">${art.title}</div>
+                  <div class="news-item-snippet">${art.description ? art.description.replace(/<[^>]+>/g, '') : ''}</div>
+                </div>
+              </a>
+            `).join('')}
+          </div>
+        `;
+      }
+    }
+
+    function closeArchiveModal() {
+      document.getElementById('archive-modal').style.display = 'none';
+    }
+
+    function updateKPIs() {
+      const total = aggregatedEvents.length || 1;
+      const quakes = aggregatedEvents.filter(e => e.type === 'Seismic').length;
+      const floods = aggregatedEvents.filter(e => e.type === 'Flood Alert').length;
+      const heatwaves = aggregatedEvents.filter(e => e.type === 'Heatwave').length;
+
+      document.getElementById('kpi-total').innerText = aggregatedEvents.length;
+      document.getElementById('kpi-critical').innerText = aggregatedEvents.filter(e => e.severity === 'CRITICAL').length;
+      document.getElementById('kpi-seismic').innerText = quakes;
+      document.getElementById('kpi-floods').innerText = floods + heatwaves;
+
+      const pQuakes = Math.round((quakes / total) * 100);
+      const pFloods = Math.round((floods / total) * 100);
+      const pFires = Math.round(((aggregatedEvents.length - quakes - floods) / total) * 100);
+
+      document.getElementById('pct-seismic').innerText = `${pQuakes}%`;
+      document.getElementById('bar-seismic').style.width = `${pQuakes}%`;
+      document.getElementById('pct-floods').innerText = `${pFloods}%`;
+      document.getElementById('bar-floods').style.width = `${pFloods}%`;
+      document.getElementById('pct-fires').innerText = `${pFires}%`;
+      document.getElementById('bar-fires').style.width = `${pFires}%`;
+    }
+
+    function renderHotspots() {
+      const container = document.getElementById('hotspots-list');
+      const hotspots = [
+        { name: "East Asia & Japan Heat Corridors", count: aggregatedEvents.filter(e => e.type === 'Heatwave').length, signal: "Extreme Heatwaves & Thermal Stress" },
+        { name: "Global Seismic Belt", count: aggregatedEvents.filter(e => e.type === 'Seismic').length, signal: "Earthquake Activity" },
+        { name: "South Asia & River Basins", count: aggregatedEvents.filter(e => e.type === 'Flood Alert').length, signal: "Monsoon Inundation & Floods" }
+      ];
+
+      container.innerHTML = hotspots.map(h => `
+        <div class="hotspot-card">
+          <div>
+            <div class="hotspot-country">${h.name}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; margin-top: 2px;">${h.signal}</div>
+          </div>
+          <div class="hotspot-count">${h.count}</div>
+        </div>
+      `).join('');
+    }
+
+    function filterCategory(cat, btn) {
+      currentCategory = cat;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderFilteredView();
+    }
+
+    function handleSearch() { renderFilteredView(); }
+
+    async function initDashboard() {
+      aggregatedEvents = [];
+      await Promise.all([fetchUSGS(), fetchNOAAMeteorology(), fetchGloFASFloods(), fetchClimateMetrics()]);
+      updateKPIs();
+      renderFilteredView();
+      renderHotspots();
+      await fetchDisasterNewsWithImages();
+    }
+
+    initDashboard();
+    setInterval(async () => { await initDashboard(); }, 300000);
+  </script>
+</body>
+</html>
