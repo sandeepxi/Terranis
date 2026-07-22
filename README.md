@@ -2,6 +2,7 @@
 
   <h1>Terranis • Global Environmental Intelligence Network</h1>
   <p><b>Real-time disaster and climate telemetry.</b></p>
+<img width="1346" height="959" alt="image" src="https://github.com/user-attachments/assets/128ceff1-c409-4312-aea0-6f5d96101957" />
 
   <p>
     <img src="https://img.shields.io/badge/Status-Active%20Telemetry-059669?style=for-the-badge&logo=radar" alt="Status" />
@@ -9,7 +10,7 @@
     <img src="https://img.shields.io/badge/APIs-USGS%20%7C%20NOAA%20%7C%20Copernicus-C87A5B?style=for-the-badge" alt="APIs" />
   </p>
 
-  <a href="https://sandeepxi.github.io/terranis/">✨ Explore Live Observatory</a>
+  <a href="https://sandeepxi.github.io/Terranis/">✨ Explore Live Observatory</a>
 </div>
 
 ---
