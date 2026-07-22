@@ -7,7 +7,9 @@
  <p>
     <a href="https://sandeepxi.github.io/Terranis/"><img src="https://img.shields.io/badge/STATUS-ACTIVE%20TELEMETRY-059669?style=for-the-badge&logo=radar" alt="Status" /></a>
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/LICENSE-MIT-1C3A27?style=for-the-badge" alt="License" /></a>
-    <a href="https://earthquake.usgs.gov/"><img src="https://img.shields.io/badge/APIs-USGS%20%7C%20NOAA%20%7C%20COPERNICUS-C87A5B?style=for-the-badge" alt="APIs" /></a>
+    <a href="https://earthquake.usgs.gov/"><img src="https://img.shields.io/badge/API-USGS-C87A5B?style=for-the-badge" alt="USGS API" /></a>
+    <a href="https://www.noaa.gov/"><img src="https://img.shields.io/badge/API-NOAA-D97706?style=for-the-badge" alt="NOAA API" /></a>
+    <a href="https://www.copernicus.eu/"><img src="https://img.shields.io/badge/API-COPERNICUS-2563EB?style=for-the-badge" alt="Copernicus API" /></a>
   </p>
 
   <a href="https://sandeepxi.github.io/Terranis/">✨ Explore Live Observatory</a>
